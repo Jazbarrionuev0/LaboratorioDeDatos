@@ -7,7 +7,6 @@
 # y lo cargamos
 
 library(tidyverse)
-
 ## Importar archivos .csv
 
 # Leemos el archivo .csv y vemos la información que nos da y las opciones
@@ -161,26 +160,26 @@ gs4_browse(ss)
 gs4_find("solo varones") %>%
   googledrive::drive_trash()
 
-### Diapo 13
+### 13
 
-# Necesitamos instalar y cargar el paquete nycflights13 para mostrar el ejemplo con 
+# Paquete nycflights13: An R data package containing all out-bound flights from NYC in 2013 + useful metdata.
 
-# install.packages('nycflights13')
+install.packages('nycflights13')
 library(nycflights13)
 
 flights %>%
-  filter(dest == "IAH") %>% 
+  filter(dest == "MIA") %>% 
   group_by(year, month, day) %>%
   summarize(
     arr_delay = mean(arr_delay, na.rm = TRUE)
   )
 
-# Probemos ahora sin group_by
+# Probemos ahora sin group_by: me devuelve un valor, no la tabla
 
 flights %>%
-  filter(dest == "IAH") %>% 
+  filter(dest == "MIA") %>% 
   summarize(
-    arr_delay = mean(arr_delay, na.rm = TRUE)
+    media_delay = mean(arr_delay, na.rm = TRUE) #calculo la media del delay en arribos
   )
 
 # Y si quiero asignarlo a un objeto?
@@ -188,15 +187,16 @@ flights %>%
 vuelos <- flights %>%
   filter(dest == "IAH") %>% 
   group_by(year, month, day) %>%
-  summarize(
+  summarize( 
     arr_delay = mean(arr_delay, na.rm = TRUE)
   )
-
-#### Diapo 14
+view(vuelos)
+#### 14
 
 # Trabajemos con el conjunto de datos del experimento1
 
-experimento1 <- read_csv('Documents/LabDatos/experimento.csv',na = c("N/A",""))
+experimento1 <- read_csv('Documents/LabDatos/experimento.csv',na = c("N/A","")) 
+
 
 experimento1 <- experimento1 %>%  
   rename(
@@ -221,10 +221,7 @@ experimento1 %>% filter(sexo=='Femenino')
 # Actividad 1
 
   # Como hacemos para seleccionar aquellos que tengan 40 años y más? Tengo que obtener un tibble de 7 registros
-  
-  # Y para seleccionar aquellas mujeres que tengan 40 años y más? Tengo que obtener un tibble de 2 registros
-  
-  # Y para seleccionar menores de 18 o mayores de 50? Tengo que obtener un tibble de 11 registros
+experimento1 %>% filter(edad >= 40)
 
 # Si queremos seleccionar aquellos con edades 17 o 18, lo podemos hacer como hicieron la última actidad o con %in%
 
@@ -232,34 +229,19 @@ experimento1 %>% filter(edad %in% c(17,18))
 
 # Actidad 2
 
-  # Y si quiero todos menos los que tienen 17 o 18? Tengo que obtener un tibble de 68 registros
-
-# Es importante notar que todos estos filtros no modifican el objeto original, fijense que experimento1 sigue teniendo 107 registros
+# Y si quiero todos menos los que tienen 17 o 18? Tengo que obtener un tibble de 68 registros
+experimento1 %>% filter(!(edad %in% c(17,18)))
 
 # Si quiero modificar o guardar el resultado del filtro en ese u otro objeto, tengo que utilizar el operador asignación <-, por ejemplo
 
 prueba <- experimento1 %>% filter(edad %in% c(17,18))
 
-# Errores comunes
 
-# Usar = en lugar de ==, por suerte nos avisa, probemos los siguiente y veamos el mensaje que obtenemos
-
-experimento1 %>% filter(sexo='Femenino')
-
-# Escribir las sentencias 'o' coloquialmente
-
-experimento1 %>% filter(edad==17 | 18)
-
-# Cuantos registros obtuvimos? Qué es lo que está haciendo?
-
-## arrange: cambia el orden de las filas basado en los valores de las columnas
+## arrange: ES UN SORT
 
 # Por ejemplo, queremos ordenar el conjunto de acuerdo a la edad
 
-experimento1 %>% arrange(edad)
-
-# Podemos ordenar por más de una variable, por ejemplo, sexo y edad
-
+experimento1 %>% arrange(edad) 
 experimento1 %>% arrange(sexo,edad)
 
 # Actividad 3
@@ -268,9 +250,7 @@ experimento1 %>% arrange(sexo,edad)
 
 ## distinct: encuentra todas las filas únicas en un conjunto de datos
 
-# Lo probamos con experimento1, cuantos registros obtenemos? Eso que significa?
-
-experimento1 %>% distinct()
+experimento1 %>% distinct(edad)
 
 # Y si quisieramos sabe cuantas combinaciones de sexo y edad distintas existen?
 
@@ -282,7 +262,7 @@ experimento1 %>% distinct(sexo,edad,.keep_all=TRUE)
 
 # Y si quiero saber cuantos casos hay de cada combinación? Reemplazamos distinct por count
 
-experimento1 %>% count(sexo,edad)
+experimento1 %>% count(sexo,edad)  %>% rename(cuenta=n)
 
 # Actividad 4
 
@@ -366,13 +346,13 @@ experimento1 %>% rename(Sexo_al_nacer=sexo)
 
 # Por ejemplo, mover la edad y sexo al principio
 
-experimento1 %>% relocate(edad,sexo)
+experimento1 %>% relocate(`Marca temporal`, edad,sexo)
 
 # Existen otras posibilidades diciendo donde queremos ubicarlas utilizando el .before y .alter que usamos con el mutate()
 
 experimento1 %>% relocate(edad,.after = sexo)
 
-experimento1 %>% relocate(sexo,.before = edad)
+experimento1 %>% relocate(sexo,.after = edad)
 
 # Actividad 6
 
